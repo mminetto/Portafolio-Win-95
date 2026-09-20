@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>DOOM | Minetto.exe</title>
+    <link rel="icon" href="icon.png">
+    <style>
+        * { box-sizing: border-box; }
+        #doom-page { min-height: 100vh; margin: 0; background: #008080; font: 13px Tahoma, sans-serif; }
+        main { width: min(1000px, calc(100% - 24px)); margin: 12px auto; padding: 3px; background: #c0c0c0; border: 2px solid; border-color: white #000 #000 white; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 4px 6px; color: white; background: #000080; font-weight: bold; }
+        header a { color: black; background: #c0c0c0; padding: 2px 6px; text-decoration: none; border: 2px outset white; }
+        #controls, #connection { margin: 10px; line-height: 1.5; }
+        #player { display: flex; justify-content: center; align-items: center; width: 100%; height: min(72vh, 700px); min-height: 240px; border: 2px inset white; background: black; }
+        #canvas { display: block; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; outline: none; }
+        #canvas:fullscreen { background: black; }
+        .doom-actions { margin: 10px; display: flex; gap: 8px; }
+        .doom-actions button { padding: 6px 12px; font: inherit; background: #c0c0c0; border: 2px outset white; cursor: pointer; }
+        .doom-actions button:active { border-style: inset; }
+        .doom-actions button:focus-visible { outline: 1px dotted black; outline-offset: -4px; }
+        [hidden] { display: none; }
+    </style>
+</head>
+<body id="doom-page">
+    <main>
+        <header><span>DOOM — Minetto.exe</span><a href="index.html" id="back">Volver al portafolio</a></header>
+        <section id="game" hidden>
+            <p id="controls">Flechas: moverse · Ctrl: disparar · Espacio: abrir puertas · Enter: confirmar · Esc: menú. Haz clic en el juego para darle el foco.</p>
+            <div class="doom-actions">
+                <button id="doom-start" type="button">Iniciar DOOM</button>
+                <button id="doom-fullscreen" type="button" disabled>Pantalla completa</button>
+            </div>
+            <div id="player"><canvas id="canvas" width="640" height="400" tabindex="0" aria-label="DOOM"></canvas></div>
+            <p id="connection" role="status">DOOM clásico — episodio shareware. Todos los archivos del juego están incluidos en el proyecto.</p>
+        </section>
+    </main>
+    <script src="doom.js"></script>
+</body>
+</html>
