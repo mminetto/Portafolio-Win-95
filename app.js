@@ -1,15 +1,6 @@
-/* =========================
-   VARIABLES GENERALES
-========================= */
-
 let topZ = 10;
 
 let currentLanguage = "es";
-
-
-/* =========================
-   TRADUCCIONES
-========================= */
 
 const translations = {
 
@@ -245,9 +236,6 @@ const translations = {
     },
 
 
-    /* =========================================
-       INGLES
-    ========================================= */
 
     en: {
 
@@ -482,9 +470,7 @@ const translations = {
 };
 
 
-/* =========================
-   ABRIR VENTANA
-========================= */
+/* abrir ventana */
 
 function openWindow(id) {
 
@@ -514,9 +500,7 @@ function openWindow(id) {
 }
 
 
-/* =========================
-   CERRAR VENTANA
-========================= */
+/* cerrar ventana */
 
 function closeWindow(id) {
 
@@ -534,9 +518,7 @@ function closeWindow(id) {
 }
 
 
-/* =========================
-   MINIMIZAR
-========================= */
+/* minimizar */
 
 function minimizeWindow(id) {
 
@@ -771,9 +753,7 @@ function applyLanguage(language) {
 }
 
 
-/* =========================
-   CAMBIAR IDIOMA
-========================= */
+/* CAMBIAR IDIOMA */
 
 function toggleLanguage() {
 
@@ -792,9 +772,7 @@ function toggleLanguage() {
 }
 
 
-/* =========================
-   MENSAJE APAGADO
-========================= */
+/* MENSAJE APAGADO */
 
 function shutdownMessage() {
 
@@ -817,9 +795,7 @@ function shutdownMessage() {
 }
 
 
-/* =========================
-   VENTANAS ARRASTRABLES
-========================= */
+/* VENTANAS ARRASTRABLES */
 
 document
     .querySelectorAll(
@@ -921,10 +897,9 @@ document
     });
 
 
-/* =========================
+/* 
    CERRAR MENU INICIO
-   AL HACER CLICK AFUERA
-========================= */
+   AL HACER CLICK AFUERA */
 
 document
     .addEventListener(
@@ -967,11 +942,6 @@ document
     );
 
 
-/* =========================
-   INICIAR PAGINA
-========================= */
 
 applyLanguage("es");
-
-
 openWindow("about");
