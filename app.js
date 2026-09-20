@@ -232,7 +232,47 @@ const translations = {
         /* BOTON IDIOMA */
 
         languageButtonTitle:
-            "Cambiar idioma"
+            "Cambiar idioma",
+
+        desktopMinesweeper:
+            "Buscaminas",
+
+        minesweeperTitle:
+            "💣 Buscaminas",
+
+        minesLabel:
+            "Minas",
+
+        statusLabel:
+            "Estado",
+
+        minesweeperHelp:
+            "Clic izquierdo: descubrir · Clic derecho: colocar bandera.",
+
+        minesweeperPlaying:
+            "Jugando",
+
+        minesweeperWon:
+            "¡Ganaste!",
+
+        minesweeperLost:
+            "Perdiste",
+
+        minesweeperNewGame:
+            "Nueva partida",
+
+        minesweeperBoardLabel:
+            "Tablero de Buscaminas",
+
+        minesweeperHiddenCell:
+            "Casilla oculta",
+
+        minesweeperFlaggedCell:
+            "Casilla marcada con bandera",
+
+        minesweeperRevealedCell:
+            "Casilla descubierta"
+
     },
 
 
@@ -465,7 +505,47 @@ const translations = {
         /* LANGUAGE */
 
         languageButtonTitle:
-            "Change language"
+            "Change language",
+
+        desktopMinesweeper:
+        "Minesweeper",
+
+        minesweeperTitle:
+            "💣 Minesweeper",
+
+        minesLabel:
+            "Mines",
+
+        statusLabel:
+            "Status",
+
+        minesweeperHelp:
+            "Left click: reveal · Right click: place flag.",
+
+        minesweeperPlaying:
+            "Playing",
+
+        minesweeperWon:
+            "You won!",
+
+        minesweeperLost:
+            "You lost",
+
+        minesweeperNewGame:
+            "New game",
+
+        minesweeperBoardLabel:
+            "Minesweeper board",
+
+        minesweeperHiddenCell:
+            "Hidden cell",
+
+        minesweeperFlaggedCell:
+            "Flagged cell",
+
+        minesweeperRevealedCell:
+            "Revealed cell"
+
     }
 };
 
@@ -495,6 +575,16 @@ function openWindow(id) {
         .classList
         .remove("open");
 
+
+        if (
+        minesweeperBoard.length > 0
+    ) {
+
+        renderMinesweeperBoard();
+
+        updateMinesweeperStatus();
+
+    }   
 
     updateTaskbar();
 }
@@ -794,6 +884,897 @@ function shutdownMessage() {
     }
 }
 
+/* =========================
+   BUSCAMINAS
+========================= */
+
+const MINESWEEPER_ROWS = 9;
+
+const MINESWEEPER_COLS = 9;
+
+const MINESWEEPER_MINES = 10;
+
+
+let minesweeperBoard = [];
+
+let minesweeperGameOver = false;
+
+let minesweeperResult = null;
+
+let minesweeperFirstMove = true;
+
+let minesweeperFlags = 0;
+
+
+/* =========================
+   CREAR PARTIDA
+========================= */
+
+function createMinesweeper() {
+
+    minesweeperBoard = [];
+
+    minesweeperGameOver = false;
+
+    minesweeperResult = null;
+
+    minesweeperFirstMove = true;
+
+    minesweeperFlags = 0;
+
+
+    const totalCells =
+        MINESWEEPER_ROWS *
+        MINESWEEPER_COLS;
+
+
+    for (
+        let i = 0;
+        i < totalCells;
+        i++
+    ) {
+
+        minesweeperBoard.push({
+
+            mine: false,
+
+            revealed: false,
+
+            flagged: false,
+
+            adjacent: 0
+
+        });
+
+    }
+
+
+    renderMinesweeperBoard();
+
+    updateMinesweeperStatus();
+}
+
+
+/* =========================
+   COLOCAR MINAS
+========================= */
+
+function placeMines(excludedIndex) {
+
+    let placed = 0;
+
+
+    while (
+        placed <
+        MINESWEEPER_MINES
+    ) {
+
+        const randomIndex =
+            Math.floor(
+                Math.random() *
+                minesweeperBoard.length
+            );
+
+
+        if (
+            randomIndex ===
+            excludedIndex
+        ) {
+            continue;
+        }
+
+
+        if (
+            minesweeperBoard[
+                randomIndex
+            ].mine
+        ) {
+            continue;
+        }
+
+
+        minesweeperBoard[
+            randomIndex
+        ].mine = true;
+
+
+        placed++;
+
+    }
+
+
+    calculateAdjacentMines();
+}
+
+
+/* =========================
+   MINAS VECINAS
+========================= */
+
+function calculateAdjacentMines() {
+
+    minesweeperBoard
+        .forEach(
+            (
+                cell,
+                index
+            ) => {
+
+                if (
+                    cell.mine
+                ) {
+
+                    cell.adjacent =
+                        0;
+
+                    return;
+                }
+
+
+                const neighbors =
+                    getNeighbors(
+                        index
+                    );
+
+
+                cell.adjacent =
+                    neighbors.filter(
+                        neighborIndex =>
+
+                            minesweeperBoard[
+                                neighborIndex
+                            ].mine
+
+                    ).length;
+
+            }
+        );
+}
+
+
+/* =========================
+   OBTENER VECINOS
+========================= */
+
+function getNeighbors(index) {
+
+    const neighbors = [];
+
+
+    const row =
+        Math.floor(
+            index /
+            MINESWEEPER_COLS
+        );
+
+
+    const col =
+        index %
+        MINESWEEPER_COLS;
+
+
+    for (
+        let rowOffset = -1;
+        rowOffset <= 1;
+        rowOffset++
+    ) {
+
+        for (
+            let colOffset = -1;
+            colOffset <= 1;
+            colOffset++
+        ) {
+
+            if (
+                rowOffset === 0 &&
+                colOffset === 0
+            ) {
+                continue;
+            }
+
+
+            const newRow =
+                row +
+                rowOffset;
+
+
+            const newCol =
+                col +
+                colOffset;
+
+
+            if (
+                newRow >= 0 &&
+                newRow <
+                MINESWEEPER_ROWS &&
+                newCol >= 0 &&
+                newCol <
+                MINESWEEPER_COLS
+            ) {
+
+                neighbors.push(
+
+                    newRow *
+                    MINESWEEPER_COLS +
+                    newCol
+
+                );
+
+            }
+
+        }
+
+    }
+
+
+    return neighbors;
+}
+
+
+/* =========================
+   MOSTRAR TABLERO
+========================= */
+
+function renderMinesweeperBoard() {
+
+    const board =
+        document.getElementById(
+            "minesweeperBoard"
+        );
+
+
+    if (!board) {
+        return;
+    }
+
+
+    board.innerHTML = "";
+
+
+    const dictionary =
+        translations[
+            currentLanguage
+        ];
+
+
+    board.setAttribute(
+        "aria-label",
+        dictionary
+            .minesweeperBoardLabel
+    );
+
+
+    minesweeperBoard
+        .forEach(
+            (
+                cell,
+                index
+            ) => {
+
+                const button =
+                    document.createElement(
+                        "button"
+                    );
+
+
+                button.type =
+                    "button";
+
+
+                button.className =
+                    "mine-cell";
+
+
+                button.dataset.index =
+                    index;
+
+
+                button.setAttribute(
+                    "role",
+                    "gridcell"
+                );
+
+
+                /* DESCUBIERTA */
+
+                if (
+                    cell.revealed
+                ) {
+
+                    button.classList.add(
+                        "revealed"
+                    );
+
+
+                    if (
+                        cell.mine
+                    ) {
+
+                        button.textContent =
+                            "💣";
+
+
+                        button.classList.add(
+                            "mine"
+                        );
+
+                    } else if (
+                        cell.adjacent > 0
+                    ) {
+
+                        button.textContent =
+                            cell.adjacent;
+
+
+                        button.classList.add(
+                            "number-" +
+                            cell.adjacent
+                        );
+
+                    }
+
+
+                    button.setAttribute(
+                        "aria-label",
+
+                        dictionary
+                            .minesweeperRevealedCell
+
+                    );
+
+                }
+
+
+                /* BANDERA */
+
+                else if (
+                    cell.flagged
+                ) {
+
+                    button.textContent =
+                        "🚩";
+
+
+                    button.setAttribute(
+                        "aria-label",
+
+                        dictionary
+                            .minesweeperFlaggedCell
+
+                    );
+
+                }
+
+
+                /* OCULTA */
+
+                else {
+
+                    button.setAttribute(
+                        "aria-label",
+
+                        dictionary
+                            .minesweeperHiddenCell
+
+                    );
+
+                }
+
+
+                /* CLICK IZQUIERDO */
+
+                button.addEventListener(
+                    "click",
+                    event => {
+
+                        if (
+                            event.shiftKey
+                        ) {
+
+                            toggleMinesweeperFlag(
+                                index
+                            );
+
+                            return;
+                        }
+
+
+                        revealMinesweeperCell(
+                            index
+                        );
+
+                    }
+                );
+
+
+                /* CLICK DERECHO */
+
+                button.addEventListener(
+                    "contextmenu",
+                    event => {
+
+                        event.preventDefault();
+
+
+                        toggleMinesweeperFlag(
+                            index
+                        );
+
+                    }
+                );
+
+
+                board.appendChild(
+                    button
+                );
+
+            }
+        );
+}
+
+
+/* =========================
+   DESCUBRIR CASILLA
+========================= */
+
+function revealMinesweeperCell(index) {
+
+    if (
+        minesweeperGameOver
+    ) {
+        return;
+    }
+
+
+    const cell =
+        minesweeperBoard[
+            index
+        ];
+
+
+    if (
+        cell.revealed ||
+        cell.flagged
+    ) {
+        return;
+    }
+
+
+    /* PRIMER CLICK NUNCA ES MINA */
+
+    if (
+        minesweeperFirstMove
+    ) {
+
+        placeMines(
+            index
+        );
+
+
+        minesweeperFirstMove =
+            false;
+
+    }
+
+
+    /* PISAR MINA */
+
+    if (
+        cell.mine
+    ) {
+
+        cell.revealed =
+            true;
+
+
+        minesweeperGameOver =
+            true;
+
+
+        minesweeperResult =
+            "lost";
+
+
+        revealAllMines();
+
+
+        renderMinesweeperBoard();
+
+        updateMinesweeperStatus();
+
+
+        return;
+    }
+
+
+    floodReveal(
+        index
+    );
+
+
+    checkMinesweeperWin();
+
+
+    renderMinesweeperBoard();
+
+    updateMinesweeperStatus();
+}
+
+
+/* =========================
+   ABRIR CASILLAS VACIAS
+========================= */
+
+function floodReveal(startIndex) {
+
+    const stack =
+        [startIndex];
+
+
+    const visited =
+        new Set();
+
+
+    while (
+        stack.length > 0
+    ) {
+
+        const index =
+            stack.pop();
+
+
+        if (
+            visited.has(
+                index
+            )
+        ) {
+            continue;
+        }
+
+
+        visited.add(
+            index
+        );
+
+
+        const cell =
+            minesweeperBoard[
+                index
+            ];
+
+
+        if (
+            cell.mine ||
+            cell.flagged
+        ) {
+            continue;
+        }
+
+
+        cell.revealed =
+            true;
+
+
+        if (
+            cell.adjacent === 0
+        ) {
+
+            const neighbors =
+                getNeighbors(
+                    index
+                );
+
+
+            neighbors.forEach(
+                neighborIndex => {
+
+                    const neighbor =
+                        minesweeperBoard[
+                            neighborIndex
+                        ];
+
+
+                    if (
+                        !neighbor.revealed &&
+                        !neighbor.mine &&
+                        !neighbor.flagged
+                    ) {
+
+                        stack.push(
+                            neighborIndex
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+    }
+}
+
+
+/* =========================
+   BANDERAS
+========================= */
+
+function toggleMinesweeperFlag(index) {
+
+    if (
+        minesweeperGameOver
+    ) {
+        return;
+    }
+
+
+    const cell =
+        minesweeperBoard[
+            index
+        ];
+
+
+    if (
+        cell.revealed
+    ) {
+        return;
+    }
+
+
+    if (
+        cell.flagged
+    ) {
+
+        cell.flagged =
+            false;
+
+
+        minesweeperFlags--;
+
+    } else {
+
+        if (
+            minesweeperFlags >=
+            MINESWEEPER_MINES
+        ) {
+            return;
+        }
+
+
+        cell.flagged =
+            true;
+
+
+        minesweeperFlags++;
+
+    }
+
+
+    renderMinesweeperBoard();
+
+    updateMinesweeperStatus();
+}
+
+
+/* =========================
+   MOSTRAR TODAS LAS MINAS
+========================= */
+
+function revealAllMines() {
+
+    minesweeperBoard
+        .forEach(
+            cell => {
+
+                if (
+                    cell.mine
+                ) {
+
+                    cell.revealed =
+                        true;
+
+                }
+
+            }
+        );
+}
+
+
+/* =========================
+   COMPROBAR VICTORIA
+========================= */
+
+function checkMinesweeperWin() {
+
+    const safeCells =
+        minesweeperBoard.filter(
+            cell =>
+                !cell.mine
+        );
+
+
+    const allSafeRevealed =
+        safeCells.every(
+            cell =>
+                cell.revealed
+        );
+
+
+    if (
+        allSafeRevealed
+    ) {
+
+        minesweeperGameOver =
+            true;
+
+
+        minesweeperResult =
+            "won";
+
+
+        minesweeperBoard
+            .forEach(
+                cell => {
+
+                    if (
+                        cell.mine
+                    ) {
+
+                        cell.flagged =
+                            true;
+
+                    }
+
+                }
+            );
+
+
+        minesweeperFlags =
+            MINESWEEPER_MINES;
+
+    }
+}
+
+
+/* =========================
+   ACTUALIZAR PANEL
+========================= */
+
+function updateMinesweeperStatus() {
+
+    const counter =
+        document.getElementById(
+            "mineCounter"
+        );
+
+
+    const status =
+        document.getElementById(
+            "minesweeperStatus"
+        );
+
+
+    const resetButton =
+        document.getElementById(
+            "minesweeperReset"
+        );
+
+
+    if (
+        !counter ||
+        !status ||
+        !resetButton
+    ) {
+        return;
+    }
+
+
+    const dictionary =
+        translations[
+            currentLanguage
+        ];
+
+
+    counter.textContent =
+        MINESWEEPER_MINES -
+        minesweeperFlags;
+
+
+    if (
+        minesweeperResult ===
+        "won"
+    ) {
+
+        status.textContent =
+            dictionary
+                .minesweeperWon;
+
+
+        resetButton.textContent =
+            "😎";
+
+    } else if (
+        minesweeperResult ===
+        "lost"
+    ) {
+
+        status.textContent =
+            dictionary
+                .minesweeperLost;
+
+
+        resetButton.textContent =
+            "😵";
+
+    } else {
+
+        status.textContent =
+            dictionary
+                .minesweeperPlaying;
+
+
+        resetButton.textContent =
+            "🙂";
+
+    }
+
+
+    resetButton.title =
+        dictionary
+            .minesweeperNewGame;
+
+
+    resetButton.setAttribute(
+        "aria-label",
+
+        dictionary
+            .minesweeperNewGame
+    );
+}
+
+
+/* =========================
+   BOTON REINICIAR
+========================= */
+
+const minesweeperReset =
+    document.getElementById(
+        "minesweeperReset"
+    );
+
+
+if (
+    minesweeperReset
+) {
+
+    minesweeperReset
+        .addEventListener(
+            "click",
+            createMinesweeper
+        );
+
+}
+
 
 /* VENTANAS ARRASTRABLES */
 
@@ -943,5 +1924,8 @@ document
 
 
 
+createMinesweeper();
+
 applyLanguage("es");
+
 openWindow("about");

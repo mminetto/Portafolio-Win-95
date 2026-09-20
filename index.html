@@ -42,6 +42,11 @@
         <span data-i18n="desktopContact">Contacto</span>
     </div>
 
+    <div class="desktop-icon" onclick="openWindow('minesweeper')">
+        <span class="emoji">💣</span>
+        <span data-i18n="desktopMinesweeper">Buscaminas</span>
+    </div>
+
 
     <!-- ========================================
          SOBRE MI
@@ -882,6 +887,134 @@
 
     </div>
 
+    <!-- ========================================
+     BUSCAMINAS
+========================================= -->
+
+<div
+    class="window minesweeper-window"
+    id="minesweeper"
+    style="top:85px; left:320px; width:390px;"
+>
+
+    <div class="window-header">
+
+        <div
+            class="window-title"
+            data-i18n="minesweeperTitle"
+        >
+            💣 Buscaminas
+        </div>
+
+        <div class="window-buttons">
+
+            <button
+                class="win-btn"
+                onclick="minimizeWindow('minesweeper')"
+            >
+                _
+            </button>
+
+            <button class="win-btn">
+                □
+            </button>
+
+            <button
+                class="win-btn"
+                onclick="closeWindow('minesweeper')"
+            >
+                ×
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="menu-bar">
+
+        <span data-i18n="file">
+            Archivo
+        </span>
+
+        <span data-i18n="view">
+            Ver
+        </span>
+
+        <span data-i18n="help">
+            Ayuda
+        </span>
+
+    </div>
+
+
+    <!-- buscamina -->
+
+    <div class="window-content minesweeper-content">
+
+        <div class="minesweeper-panel">
+
+            <div class="minesweeper-counter">
+
+                <span data-i18n="minesLabel">
+                    Minas
+                </span>
+
+                <span>:</span>
+
+                <span id="mineCounter">
+                    10
+                </span>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="minesweeperReset"
+                class="minesweeper-reset"
+            >
+                🙂
+            </button>
+
+
+            <div class="minesweeper-status">
+
+                <span data-i18n="statusLabel">
+                    Estado
+                </span>
+
+                <span>:</span>
+
+                <span id="minesweeperStatus">
+                    Jugando
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="minesweeperBoard"
+            class="minesweeper-board"
+            role="grid"
+        >
+        </div>
+
+
+        <p
+            class="minesweeper-help"
+            data-i18n="minesweeperHelp"
+        >
+            Clic izquierdo: descubrir ·
+            Clic derecho: colocar bandera.
+        </p>
+
+    </div>
+
+</div>
+
 
     <!-- ========================================
          CONTACTO
@@ -1081,6 +1214,16 @@
             </span>
         </div>
 
+
+        <div
+            class="start-option"
+            onclick="openWindow('minesweeper')"
+        >
+            💣
+            <span data-i18n="desktopMinesweeper">
+                Buscaminas
+            </span>
+        </div>
 
         <hr>
 
