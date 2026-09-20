@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Minetto.exe | Portafolio</title>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<div class="desktop">
+
+    <!-- ICONOS DEL ESCRITORIO -->
+
+    <div class="desktop-icon" onclick="openWindow('about')">
+        <span class="emoji">🖥️</span>
+        <span data-i18n="desktopComputer">Mi PC</span>
+    </div>
+
+    <div class="desktop-icon" onclick="openWindow('projects')">
+        <span class="emoji">📁</span>
+        <span data-i18n="desktopProjects">Proyectos</span>
+    </div>
+
+    <div class="desktop-icon" onclick="openWindow('skills')">
+        <span class="emoji">💾</span>
+        <span data-i18n="desktopSkills">Habilidades</span>
+    </div>
+
+    <div class="desktop-icon" onclick="openWindow('cv')">
+        <span class="emoji">📄</span>
+        <span>CV</span>
+    </div>
+
+    <div class="desktop-icon" onclick="openWindow('contact')">
+        <span class="emoji">📨</span>
+        <span data-i18n="desktopContact">Contacto</span>
+    </div>
+
+
+    <!-- ========================================
+         SOBRE MI
+    ========================================= -->
+
+    <div
+        class="window"
+        id="about"
+        style="top:60px; left:170px;"
+    >
+
+        <div class="window-header">
+
+            <div class="window-title">
+                🖥️ Minetto.exe
+            </div>
+
+            <div class="window-buttons">
+
+                <button
+                    class="win-btn"
+                    onclick="minimizeWindow('about')"
+                >
+                    _
+                </button>
+
+                <button class="win-btn">
+                    □
+                </button>
+
+                <button
+                    class="win-btn"
+                    onclick="closeWindow('about')"
+                >
+                    ×
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="menu-bar">
+
+            <span data-i18n="file">
+                Archivo
+            </span>
+
+            <span data-i18n="edit">
+                Editar
+            </span>
+
+            <span data-i18n="view">
+                Ver
+            </span>
+
+            <span data-i18n="help">
+                Ayuda
+            </span>
+
+        </div>
+
+
+        <div class="window-content">
+
+            <h1>
+                Matias Minetto
+            </h1>
+
+
+            <p
+                data-i18n-html="aboutIntro"
+            >
+                Estudiante de
+                <strong>
+                    Ingeniería en Ciencia de Datos
+                </strong>
+                y Técnico en Computación.
+            </p>
+
+
+            <p
+                data-i18n="aboutDescription"
+            >
+                Me interesa la tecnología, programación,
+                análisis de datos, infraestructura y soporte IT.
+            </p>
+
+
+            <h2 data-i18n="currently">
+                Actualmente
+            </h2>
+
+
+            <ul>
+
+                <li data-i18n="currentlyStudy">
+                    Estudiando Ingeniería en Ciencia de Datos.
+                </li>
+
+                <li data-i18n="currentlyProjects">
+                    Desarrollando proyectos personales.
+                </li>
+
+                <li data-i18n="currentlyLearning">
+                    Aprendiendo nuevas tecnologías.
+                </li>
+
+                <li data-i18n="currentlyJobs">
+                    Buscando oportunidades dentro del área IT.
+                </li>
+
+            </ul>
+
+
+            <br>
+
+
+            <button
+                class="button95"
+                onclick="openWindow('projects')"
+                data-i18n="viewProjects"
+            >
+                Ver proyectos
+            </button>
+
+
+            <button
+                class="button95"
+                onclick="openWindow('cv')"
+                data-i18n="viewCV"
+            >
+                Ver CV
+            </button>
+
+
+            <button
+                class="button95"
+                onclick="openWindow('contact')"
+                data-i18n="contactMe"
+            >
+                Contactarme
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================
+         PROYECTOS
+    ========================================= -->
+
+    <div
+        class="window"
+        id="projects"
+        style="top:90px; left:260px;"
+    >
+
+        <div class="window-header">
+
+            <div
+                class="window-title"
+                data-i18n="projectsWindowTitle"
+            >
+                📁 C:\Minetto\Proyectos
+            </div>
+
+
+            <div class="window-buttons">
+
+                <button
+                    class="win-btn"
+                    onclick="minimizeWindow('projects')"
+                >
+                    _
+                </button>
+
+                <button class="win-btn">
+                    □
+                </button>
+
+                <button
+                    class="win-btn"
+                    onclick="closeWindow('projects')"
+                >
+                    ×
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="menu-bar">
+
+            <span data-i18n="file">
+                Archivo
+            </span>
+
+            <span data-i18n="edit">
+                Editar
+            </span>
+
+            <span data-i18n="view">
+                Ver
+            </span>
+
+            <span data-i18n="help">
+                Ayuda
+            </span>
+
+        </div>
+
+
+        <div class="window-content">
+
+            <h1 data-i18n="myProjects">
+                Mis proyectos
+            </h1>
+
+
+            <!-- INVENTARIO -->
+
+            <div class="project">
+
+                <h3 data-i18n="inventoryTitle">
+                    📦 Sistema de Inventario
+                </h3>
+
+
+                <p data-i18n="inventoryDescription">
+                    Sistema para administrar productos,
+                    stock, usuarios, remitos y movimientos
+                    de inventario.
+                </p>
+
+
+                <span class="tag">
+                    C
+                </span>
+
+                <span class="tag">
+                    SQL
+                </span>
+
+                <span
+                    class="tag"
+                    data-i18n="database"
+                >
+                    Base de datos
+                </span>
+
+            </div>
+
+
+            <!-- ESPORTS -->
+
+            <div class="project">
+
+                <h3 data-i18n="esportsTitle">
+                    🎮 Torneo eSports UP
+                </h3>
+
+
+                <p data-i18n="esportsDescription">
+                    Planificación y organización de un
+                    torneo universitario interfacultades.
+                </p>
+
+
+                <span
+                    class="tag"
+                    data-i18n="projectManagement"
+                >
+                    Gestión de proyectos
+                </span>
+
+
+                <span
+                    class="tag"
+                    data-i18n="planning"
+                >
+                    Planificación
+                </span>
+
+            </div>
+
+
+            <!-- PORTFOLIO -->
+
+            <div class="project">
+
+                <h3 data-i18n="portfolioTitle">
+                    🌐 Portafolio Windows 95
+                </h3>
+
+
+                <p data-i18n="portfolioDescription">
+                    Desarrollo de un portafolio web personal
+                    inspirado en la interfaz de Windows 95,
+                    diseñado para presentar mi perfil profesional,
+                    formación, habilidades y proyectos.
+                    El sitio combina una estética retro con una
+                    experiencia interactiva, aplicando conceptos
+                    de desarrollo frontend, diseño de interfaces
+                    y experiencia de usuario.
+                </p>
+
+
+                <span class="tag">
+                    HTML<br>
+                </span>
+
+                <span class="tag">
+                    JavaScript<br>
+                </span>
+
+                <span class="tag">
+                    CSS<br>
+                </span>
+
+                                <p>
+
+                    <a
+                        href="#"
+                        data-i18n="openProject"
+                    >
+                        Abrir proyecto
+                    </a>
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================
+         SKILLS
+    ========================================= -->
+
+    <div
+        class="window"
+        id="skills"
+        style="top:120px; left:350px;"
+    >
+
+        <div class="window-header">
+
+            <div class="window-title">
+                💾 Skills.txt
+            </div>
+
+
+            <div class="window-buttons">
+
+                <button
+                    class="win-btn"
+                    onclick="minimizeWindow('skills')"
+                >
+                    _
+                </button>
+
+                <button class="win-btn">
+                    □
+                </button>
+
+                <button
+                    class="win-btn"
+                    onclick="closeWindow('skills')"
+                >
+                    ×
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="menu-bar">
+
+            <span data-i18n="file">
+                Archivo
+            </span>
+
+            <span data-i18n="edit">
+                Editar
+            </span>
+
+            <span data-i18n="search">
+                Buscar
+            </span>
+
+        </div>
+
+
+        <div class="window-content">
+
+            <h1 data-i18n="technicalSkills">
+                Habilidades técnicas
+            </h1>
+
+
+            <h2 data-i18n="programming">
+                Programación
+            </h2>
+
+            <p>
+                Python<br>
+                C<br>
+                SQL<br>
+                HTML / CSS<br>
+                JavaScript
+            </p>
+
+
+            <h2 data-i18n="data">
+                Datos
+            </h2>
+
+            <p data-i18n="databases">
+                Bases de Datos
+            </p>
+
+
+            <h2>
+                Sistemas / ERP
+            </h2>
+
+            <p>
+                SAP<br>
+                Git / GitHub<br>
+                Microsoft Office / Excel
+            </p>
+
+
+            <h2>
+                IT
+            </h2>
+
+            <p>
+                Hardware<br>
+                Windows<br>
+
+                <span data-i18n="technicalSupport">
+                    Soporte Técnico
+                </span>
+
+                <br>
+
+                <span data-i18n="troubleshooting">
+                    Resolución de problemas
+                </span>
+
+                <br>
+
+                <span data-i18n="networking">
+                    Redes
+                </span>
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================
+         CV
+    ========================================= -->
+
+    <div
+        class="window"
+        id="cv"
+        style="top:70px; left:390px; width:650px;"
+    >
+
+        <div class="window-header">
+
+            <div class="window-title">
+                📄 Curriculum_Vitae.doc
+            </div>
+
+
+            <div class="window-buttons">
+
+                <button
+                    class="win-btn"
+                    onclick="minimizeWindow('cv')"
+                >
+                    _
+                </button>
+
+                <button class="win-btn">
+                    □
+                </button>
+
+                <button
+                    class="win-btn"
+                    onclick="closeWindow('cv')"
+                >
+                    ×
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="menu-bar">
+
+            <span data-i18n="file">
+                Archivo
+            </span>
+
+            <span data-i18n="edit">
+                Editar
+            </span>
+
+            <span data-i18n="view">
+                Ver
+            </span>
+
+            <span data-i18n="help">
+                Ayuda
+            </span>
+
+        </div>
+
+
+        <div class="window-content">
+
+            <h1>
+                Curriculum Vitae
+            </h1>
+
+
+            <p>
+
+                <strong>
+                    Matías Minetto
+                </strong>
+
+                <br>
+
+                <span data-i18n="cvIntro">
+                    Estudiante de Ingeniería en Ciencia de Datos
+                    y Técnico en Computación.
+                </span>
+
+            </p>
+
+
+            <!-- EDUCACION -->
+
+            <div class="cv-section">
+
+                <h2 data-i18n="education">
+                    Educación
+                </h2>
+
+
+                <div class="cv-item">
+
+                    <h3 data-i18n="dataScienceEngineering">
+                        Ingeniería en Ciencia de Datos
+                    </h3>
+
+                    <div
+                        class="cv-meta"
+                        data-i18n="palermoDate"
+                    >
+                        Universidad de Palermo · Mar. 2026 – Actualidad
+                    </div>
+
+                </div>
+
+
+                <div class="cv-item">
+
+                    <h3 data-i18n="computerTechnician">
+                        Técnico en Computación
+                    </h3>
+
+                    <div
+                        class="cv-meta"
+                        data-i18n="krauseDate"
+                    >
+                        Escuela Técnica N.º 1 Otto Krause ·
+                        Mar. 2019 – Dic. 2024
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PROYECTOS CV -->
+
+            <div class="cv-section">
+
+                <h2 data-i18n="projects">
+                    Proyectos
+                </h2>
+
+
+                <div class="cv-item">
+
+                    <h3 data-i18n="cvInventoryTitle">
+                        Sistema de Gestión de Inventario –
+                        Depósito Escolar
+                    </h3>
+
+
+                    <p data-i18n="cvInventoryDescription">
+                        Gestión de productos, usuarios, stock
+                        y movimientos, con automatización de
+                        control de stock, trazabilidad y lectura
+                        e impresión de códigos de barras.
+                    </p>
+
+                </div>
+
+
+                <div class="cv-item">
+
+                    <h3 data-i18n="cvEsportsTitle">
+                        Torneo eSports UP
+                    </h3>
+
+
+                    <p data-i18n="cvEsportsDescription">
+                        Planificación y organización de un torneo
+                        universitario interfacultades, incluyendo
+                        reglamento, logística, difusión, sponsors
+                        e inscripciones.
+                    </p>
+
+                </div>
+
+
+                <div class="cv-item">
+
+                    <h3 data-i18n="cvPortfolioTitle">
+                        Portafolio Windows 95
+                    </h3>
+
+
+                    <p data-i18n="cvPortfolioDescription">
+                        Portafolio web personal inspirado en
+                        Windows 95, con ventanas interactivas,
+                        escritorio, menú Inicio y barra de tareas.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- CERTIFICACIONES -->
+
+            <div class="cv-section">
+
+                <h2 data-i18n="certifications">
+                    Certificaciones y cursos
+                </h2>
+
+
+                <div class="cv-item">
+
+                    <h3>
+                        Leveraging Advanced Features in
+                        SAP Analytics Cloud for Planning
+                    </h3>
+
+                    <div class="cv-meta">
+                        SAP · 2026
+                    </div>
+
+                </div>
+
+
+                <div class="cv-item">
+
+                    <h3>
+                        Designing Stories in
+                        SAP Analytics Cloud
+                    </h3>
+
+                    <div class="cv-meta">
+                        SAP · 2026
+                    </div>
+
+                </div>
+
+
+                <div class="cv-item">
+
+                    <h3 data-i18n="introDataScience">
+                        Introducción a la Ciencia de Datos
+                    </h3>
+
+                    <div class="cv-meta">
+                        IE University · 2026
+                    </div>
+
+                </div>
+
+
+                <div class="cv-item">
+
+                    <h3 data-i18n="leadership">
+                        Liderazgo
+                    </h3>
+
+                    <div class="cv-meta">
+                        Santander Open Academy · 2026
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- CONOCIMIENTOS -->
+
+            <div class="cv-section">
+
+                <h2 data-i18n="technicalKnowledge">
+                    Conocimientos técnicos
+                </h2>
+
+
+                <p>
+
+                    <span class="tag">
+                        Python
+                    </span>
+
+                    <span class="tag">
+                        C / C++
+                    </span>
+
+                    <span class="tag">
+                        SQL
+                    </span>
+
+                    <span class="tag">
+                        HTML / CSS
+                    </span>
+
+                    <span class="tag">
+                        JavaScript
+                    </span>
+
+                    <span class="tag">
+                        Windows 10/11
+                    </span>
+
+                    <span class="tag">
+                        Microsoft 365
+                    </span>
+
+                    <span class="tag">
+                        Hardware
+                    </span>
+
+                    <span
+                        class="tag"
+                        data-i18n="networking"
+                    >
+                        Redes
+                    </span>
+
+                    <span
+                        class="tag"
+                        data-i18n="helpDesk"
+                    >
+                        Mesa de ayuda
+                    </span>
+
+                    <span
+                        class="tag"
+                        data-i18n="troubleshooting"
+                    >
+                        Resolución de problemas
+                    </span>
+
+                    <span class="tag">
+                        SAP Analytics Cloud
+                    </span>
+
+                </p>
+
+            </div>
+
+
+            <!-- IDIOMAS -->
+
+            <div class="cv-section">
+
+                <h2 data-i18n="languages">
+                    Idiomas
+                </h2>
+
+                <p data-i18n="languageLevel">
+                    Español nativo · Inglés avanzado
+                </p>
+
+            </div>
+
+
+            <div class="cv-actions">
+
+                <button
+                    class="button95"
+                    onclick="openWindow('projects')"
+                    data-i18n="viewProjects"
+                >
+                    Ver proyectos
+                </button>
+
+
+                <button
+                    class="button95"
+                    onclick="openWindow('contact')"
+                    data-i18n="contact"
+                >
+                    Contacto
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================
+         CONTACTO
+    ========================================= -->
+
+    <div
+        class="window"
+        id="contact"
+        style="top:80px; left:430px;"
+    >
+
+        <div class="window-header">
+
+            <div
+                class="window-title"
+                data-i18n="newMessage"
+            >
+                📨 Nuevo mensaje
+            </div>
+
+
+            <div class="window-buttons">
+
+                <button
+                    class="win-btn"
+                    onclick="minimizeWindow('contact')"
+                >
+                    _
+                </button>
+
+                <button class="win-btn">
+                    □
+                </button>
+
+                <button
+                    class="win-btn"
+                    onclick="closeWindow('contact')"
+                >
+                    ×
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="menu-bar">
+
+            <span data-i18n="file">
+                Archivo
+            </span>
+
+            <span data-i18n="edit">
+                Editar
+            </span>
+
+            <span data-i18n="message">
+                Mensaje
+            </span>
+
+        </div>
+
+
+        <div class="window-content">
+
+            <h1 data-i18n="contact">
+                Contacto
+            </h1>
+
+
+            <p data-i18n="contactDescription">
+                ¿Querés contactarme? Podés encontrarme en:
+            </p>
+
+
+            <p>
+
+                <strong>
+                    LinkedIn:
+                </strong>
+
+                <br>
+
+                <a
+                    href="https://www.linkedin.com/in/matiasminetto/"
+                    target="_blank"
+                >
+                    https://www.linkedin.com/in/matiasminetto/
+                </a>
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    GitHub:
+                </strong>
+
+                <br>
+
+                <a
+                    href="https://github.com/mminetto"
+                    target="_blank"
+                >
+                    https://github.com/mminetto
+                </a>
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    Email:
+                </strong>
+
+                <br>
+
+                <a href="mailto:matiasminetto@gmail.com">
+                    matiasminetto@gmail.com
+                </a>
+
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================
+     MENU INICIO
+========================================= -->
+
+<div
+    class="start-menu"
+    id="startMenu"
+>
+
+    <div class="start-side">
+        Minetto 95
+    </div>
+
+
+    <div class="start-options">
+
+        <div
+            class="start-option"
+            onclick="openWindow('about')"
+        >
+            🖥️
+            <span data-i18n="aboutMe">
+                Sobre mí
+            </span>
+        </div>
+
+
+        <div
+            class="start-option"
+            onclick="openWindow('projects')"
+        >
+            📁
+            <span data-i18n="projects">
+                Proyectos
+            </span>
+        </div>
+
+
+        <div
+            class="start-option"
+            onclick="openWindow('skills')"
+        >
+            💾
+            <span data-i18n="desktopSkills">
+                Habilidades
+            </span>
+        </div>
+
+
+        <div
+            class="start-option"
+            onclick="openWindow('cv')"
+        >
+            📄 CV
+        </div>
+
+
+        <div
+            class="start-option"
+            onclick="openWindow('contact')"
+        >
+            📨
+            <span data-i18n="contact">
+                Contacto
+            </span>
+        </div>
+
+
+        <hr>
+
+
+        <div
+            class="start-option"
+            onclick="shutdownMessage()"
+        >
+            🔌
+            <span data-i18n="shutdown">
+                Apagar...
+            </span>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================
+     BARRA DE TAREAS
+========================================= -->
+
+<div class="taskbar">
+
+    <button
+        class="start-button"
+        onclick="toggleStart()"
+    >
+        🪟
+
+        <span data-i18n="start">
+            Inicio
+        </span>
+
+    </button>
+
+
+    <div
+        class="task-items"
+        id="taskItems"
+    >
+    </div>
+
+
+    <button
+        class="language-button"
+        id="languageButton"
+        onclick="toggleLanguage()"
+        title="Cambiar idioma"
+    >
+        ES / EN
+    </button>
+
+
+    <div
+        class="clock"
+        id="clock"
+    >
+        00:00
+    </div>
+
+</div>
+
+
+<script src="app.js"></script>
+
+</body>
+
+</html>
