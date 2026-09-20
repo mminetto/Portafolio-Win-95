@@ -836,6 +836,11 @@ function applyLanguage(language) {
     );
 
 
+    if (minesweeperBoard.length) {
+        renderMinesweeperBoard();
+        updateMinesweeperStatus();
+    }
+
     /* ACTUALIZAR NOMBRES
        EN BARRA DE TAREAS */
 
@@ -888,892 +893,189 @@ function shutdownMessage() {
    BUSCAMINAS
 ========================= */
 
-const MINESWEEPER_ROWS = 9;
-
-const MINESWEEPER_COLS = 9;
-
-const MINESWEEPER_MINES = 10;
-
-
+let MINESWEEPER_ROWS = 8;
+let MINESWEEPER_COLS = 8;
+let MINESWEEPER_MINES = 10;
 let minesweeperBoard = [];
-
 let minesweeperGameOver = false;
-
 let minesweeperResult = null;
-
 let minesweeperFirstMove = true;
-
 let minesweeperFlags = 0;
+let mineLevel = "beginner";
+let mineMarks = true;
+let mineSeconds = 0;
+let mineInterval = null;
+let mineStartedAt = 0;
+const mineCopy = {
+    es: { game: "Juego", new: "Nuevo", beginner: "Principiante", intermediate: "Intermedio", expert: "Experto", marks: "Marcas (?)", exit: "Salir", help: "Ayuda", instructions: "Descubre todas las casillas sin minas. Clic derecho o Mayús + clic: bandera, interrogación y sin marca. Doble clic en un número: abrir vecinos cuando tenga las banderas necesarias. F2: nueva partida." },
+    en: { game: "Game", new: "New", beginner: "Beginner", intermediate: "Intermediate", expert: "Expert", marks: "Marks (?)", exit: "Exit", help: "Help", instructions: "Reveal every safe square. Right click or Shift + click: flag, question mark, clear. Double click a number to open its neighbors once the required flags are placed. F2: new game." }
+};
 
-
-/* =========================
-   CREAR PARTIDA
-========================= */
-
+// Small SVG sprites use integer coordinates so they remain sharp at native size.
+function mineSvg(body, width = 13, height = 13) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" aria-hidden="true">${body}</svg>`;
+}
+function mineSprite(kind) {
+    if (kind === "flag") return mineSvg('<path fill="#f00" d="M3 1h6v6H7V6H5V5H3z"/><path d="M8 6h1v4h3v2H2v-2h6z"/>');
+    return mineSvg('<path d="M6 0h1v3h2V2h2v2H9v1h2v1h2v1h-2v2H9v2H7v2H6v-2H4V9H2V7H0V6h2V4h2V2h1v1h1z"/><path fill="white" d="M4 4h2v2H4z"/>' + (kind === "wrong" ? '<path stroke="red" stroke-width="2" d="m1 1 11 11M12 1 1 12"/>' : ''));
+}
+function mineFace(state = minesweeperResult) {
+    const eyes = state === "lost" ? '<path stroke="black" d="m4 5 3 3m0-3-3 3m7-3 3 3m0-3-3 3"/>' : state === "won" ? '<path d="M3 5h12v2h-1v2h-4V7H8v2H4V7H3z"/>' : '<path d="M5 5h2v3H5zm6 0h2v3h-2z"/>';
+    const mouth = state === "pressed" ? '<path d="M7 10h4v5H7z"/>' : state === "lost" ? '<path d="M5 13h2v-1h4v1h2v1h-2v-1H7v1H5z"/>' : '<path d="M4 10h1v2h2v1h4v-1h2v-2h1v3h-2v1H6v-1H4z"/>';
+    document.getElementById("minesweeperReset").innerHTML = mineSvg('<path d="M5 0h8v1h3v3h1v2h1v6h-1v3h-3v2H5v-1H2v-3H1V5h1V2h3z"/><path fill="#ff0" d="M5 1h8v1h2v3h1v8h-3v3H5v-1H3v-3H2V5h1V3h2z"/>' + eyes + mouth, 18, 18);
+}
+function mineDisplay(id, value) {
+    const digits = value < 0 ? '-' + String(Math.min(99, -value)).padStart(2, '0') : String(Math.min(999, value)).padStart(3, '0');
+    const masks = {0: 'abcdef', 1: 'bc', 2: 'abdeg', 3: 'abcdg', 4: 'bcfg', 5: 'acdfg', 6: 'acdefg', 7: 'abc', 8: 'abcdefg', 9: 'abcdfg', '-': 'g'};
+    const segments = {a: '2,1 10,1 8,3 4,3', b: '10,2 10,9 8,8 8,4', c: '10,11 10,18 8,16 8,12', d: '2,19 10,19 8,17 4,17', e: '1,11 3,12 3,16 1,18', f: '1,2 3,4 3,8 1,9', g: '2,10 4,9 8,9 10,10 8,11 4,11'};
+    const display = document.getElementById(id);
+    display.innerHTML = [...digits].map(digit => mineSvg(Object.entries(segments).map(([key, points]) => `<polygon fill="${masks[digit].includes(key) ? '#ff0000' : '#300000'}" points="${points}"/>`).join(''), 12, 21)).join('');
+    display.setAttribute('aria-label', `${value} ${id === 'mineTimer' ? (currentLanguage === 'en' ? 'seconds' : 'segundos') : (currentLanguage === 'en' ? 'mines' : 'minas')}`);
+}
 function createMinesweeper() {
-
-    minesweeperBoard = [];
-
+    clearInterval(mineInterval);
+    mineInterval = null;
+    mineSeconds = 0;
     minesweeperGameOver = false;
-
     minesweeperResult = null;
-
     minesweeperFirstMove = true;
-
     minesweeperFlags = 0;
-
-
-    const totalCells =
-        MINESWEEPER_ROWS *
-        MINESWEEPER_COLS;
-
-
-    for (
-        let i = 0;
-        i < totalCells;
-        i++
-    ) {
-
-        minesweeperBoard.push({
-
-            mine: false,
-
-            revealed: false,
-
-            flagged: false,
-
-            adjacent: 0
-
-        });
-
-    }
-
-
+    minesweeperBoard = Array.from({length: MINESWEEPER_ROWS * MINESWEEPER_COLS}, () => ({mine: false, revealed: false, flagged: false, question: false, adjacent: 0, exploded: false}));
+    document.getElementById('minesweeper').style.width = `${MINESWEEPER_COLS * 16 + 36}px`;
     renderMinesweeperBoard();
-
     updateMinesweeperStatus();
 }
-
-
-/* =========================
-   COLOCAR MINAS
-========================= */
-
-function placeMines(excludedIndex) {
-
-    let placed = 0;
-
-
-    while (
-        placed <
-        MINESWEEPER_MINES
-    ) {
-
-        const randomIndex =
-            Math.floor(
-                Math.random() *
-                minesweeperBoard.length
-            );
-
-
-        if (
-            randomIndex ===
-            excludedIndex
-        ) {
-            continue;
-        }
-
-
-        if (
-            minesweeperBoard[
-                randomIndex
-            ].mine
-        ) {
-            continue;
-        }
-
-
-        minesweeperBoard[
-            randomIndex
-        ].mine = true;
-
-
-        placed++;
-
-    }
-
-
-    calculateAdjacentMines();
-}
-
-
-/* =========================
-   MINAS VECINAS
-========================= */
-
-function calculateAdjacentMines() {
-
-    minesweeperBoard
-        .forEach(
-            (
-                cell,
-                index
-            ) => {
-
-                if (
-                    cell.mine
-                ) {
-
-                    cell.adjacent =
-                        0;
-
-                    return;
-                }
-
-
-                const neighbors =
-                    getNeighbors(
-                        index
-                    );
-
-
-                cell.adjacent =
-                    neighbors.filter(
-                        neighborIndex =>
-
-                            minesweeperBoard[
-                                neighborIndex
-                            ].mine
-
-                    ).length;
-
-            }
-        );
-}
-
-
-/* =========================
-   OBTENER VECINOS
-========================= */
-
 function getNeighbors(index) {
-
-    const neighbors = [];
-
-
-    const row =
-        Math.floor(
-            index /
-            MINESWEEPER_COLS
-        );
-
-
-    const col =
-        index %
-        MINESWEEPER_COLS;
-
-
-    for (
-        let rowOffset = -1;
-        rowOffset <= 1;
-        rowOffset++
-    ) {
-
-        for (
-            let colOffset = -1;
-            colOffset <= 1;
-            colOffset++
-        ) {
-
-            if (
-                rowOffset === 0 &&
-                colOffset === 0
-            ) {
-                continue;
-            }
-
-
-            const newRow =
-                row +
-                rowOffset;
-
-
-            const newCol =
-                col +
-                colOffset;
-
-
-            if (
-                newRow >= 0 &&
-                newRow <
-                MINESWEEPER_ROWS &&
-                newCol >= 0 &&
-                newCol <
-                MINESWEEPER_COLS
-            ) {
-
-                neighbors.push(
-
-                    newRow *
-                    MINESWEEPER_COLS +
-                    newCol
-
-                );
-
-            }
-
-        }
-
+    const result = [], row = Math.floor(index / MINESWEEPER_COLS), col = index % MINESWEEPER_COLS;
+    for (let y = -1; y <= 1; y++) for (let x = -1; x <= 1; x++) {
+        if ((x || y) && row+y >= 0 && row+y < MINESWEEPER_ROWS && col+x >= 0 && col+x < MINESWEEPER_COLS) result.push((row+y)*MINESWEEPER_COLS+col+x);
     }
-
-
-    return neighbors;
+    return result;
 }
-
-
-/* =========================
-   MOSTRAR TABLERO
-========================= */
-
+function placeMines(excludedIndex) {
+    const candidates = minesweeperBoard.map((_, i) => i).filter(i => i !== excludedIndex);
+    for (let i = 0; i < MINESWEEPER_MINES; i++) {
+        const pick = i + Math.floor(Math.random() * (candidates.length - i));
+        [candidates[i], candidates[pick]] = [candidates[pick], candidates[i]];
+        minesweeperBoard[candidates[i]].mine = true;
+    }
+    minesweeperBoard.forEach((cell, i) => cell.adjacent = getNeighbors(i).filter(n => minesweeperBoard[n].mine).length);
+}
 function renderMinesweeperBoard() {
-
-    const board =
-        document.getElementById(
-            "minesweeperBoard"
-        );
-
-
-    if (!board) {
-        return;
-    }
-
-
-    board.innerHTML = "";
-
-
-    const dictionary =
-        translations[
-            currentLanguage
-        ];
-
-
-    board.setAttribute(
-        "aria-label",
-        dictionary
-            .minesweeperBoardLabel
-    );
-
-
-    minesweeperBoard
-        .forEach(
-            (
-                cell,
-                index
-            ) => {
-
-                const button =
-                    document.createElement(
-                        "button"
-                    );
-
-
-                button.type =
-                    "button";
-
-
-                button.className =
-                    "mine-cell";
-
-
-                button.dataset.index =
-                    index;
-
-
-                button.setAttribute(
-                    "role",
-                    "gridcell"
-                );
-
-
-                /* DESCUBIERTA */
-
-                if (
-                    cell.revealed
-                ) {
-
-                    button.classList.add(
-                        "revealed"
-                    );
-
-
-                    if (
-                        cell.mine
-                    ) {
-
-                        button.textContent =
-                            "💣";
-
-
-                        button.classList.add(
-                            "mine"
-                        );
-
-                    } else if (
-                        cell.adjacent > 0
-                    ) {
-
-                        button.textContent =
-                            cell.adjacent;
-
-
-                        button.classList.add(
-                            "number-" +
-                            cell.adjacent
-                        );
-
-                    }
-
-
-                    button.setAttribute(
-                        "aria-label",
-
-                        dictionary
-                            .minesweeperRevealedCell
-
-                    );
-
-                }
-
-
-                /* BANDERA */
-
-                else if (
-                    cell.flagged
-                ) {
-
-                    button.textContent =
-                        "🚩";
-
-
-                    button.setAttribute(
-                        "aria-label",
-
-                        dictionary
-                            .minesweeperFlaggedCell
-
-                    );
-
-                }
-
-
-                /* OCULTA */
-
-                else {
-
-                    button.setAttribute(
-                        "aria-label",
-
-                        dictionary
-                            .minesweeperHiddenCell
-
-                    );
-
-                }
-
-
-                /* CLICK IZQUIERDO */
-
-                button.addEventListener(
-                    "click",
-                    event => {
-
-                        if (
-                            event.shiftKey
-                        ) {
-
-                            toggleMinesweeperFlag(
-                                index
-                            );
-
-                            return;
-                        }
-
-
-                        revealMinesweeperCell(
-                            index
-                        );
-
-                    }
-                );
-
-
-                /* CLICK DERECHO */
-
-                button.addEventListener(
-                    "contextmenu",
-                    event => {
-
-                        event.preventDefault();
-
-
-                        toggleMinesweeperFlag(
-                            index
-                        );
-
-                    }
-                );
-
-
-                board.appendChild(
-                    button
-                );
-
-            }
-        );
+    const board = document.getElementById('minesweeperBoard');
+    const focused = board.contains(document.activeElement) ? document.activeElement.dataset.index : null;
+    board.innerHTML = '';
+    board.style.gridTemplateColumns = `repeat(${MINESWEEPER_COLS}, 16px)`;
+    board.setAttribute('aria-label', translations[currentLanguage].minesweeperBoardLabel);
+    board.setAttribute('aria-rowcount', MINESWEEPER_ROWS);
+    board.setAttribute('aria-colcount', MINESWEEPER_COLS);
+    const colors = ['', '#00f', '#008000', '#f00', '#000080', '#800000', '#008080', '#000', '#808080'];
+    const patterns = ['', '00100/01100/00100/00100/00100/00100/01110', '01110/11011/00011/00110/01100/11000/11111', '11110/00011/00011/01110/00011/00011/11110', '00011/00111/01111/11011/11111/00011/00011', '11111/11000/11000/11110/00011/00011/11110', '01110/11000/11000/11110/11011/11011/01110', '11111/00011/00110/00110/01100/01100/01100', '01110/11011/11011/01110/11011/11011/01110'];
+    minesweeperBoard.forEach((cell, index) => {
+        const button = document.createElement('button');
+        button.type = 'button'; button.className = 'mine-cell'; button.dataset.index = index;
+        button.setAttribute('role', 'gridcell');
+        const wrong = minesweeperResult === 'lost' && cell.flagged && !cell.mine;
+        if (cell.revealed || wrong) button.classList.add('revealed');
+        if (cell.exploded) button.classList.add('exploded');
+        if (wrong) button.innerHTML = mineSprite('wrong');
+        else if (cell.flagged) { button.innerHTML = mineSprite('flag'); button.classList.add('flagged'); }
+        else if (cell.revealed && cell.mine) button.innerHTML = mineSprite('mine');
+        else if (cell.revealed && cell.adjacent) {
+            button.innerHTML = mineSvg(patterns[cell.adjacent].split('/').map((row, y) => [...row].map((pixel,x) => pixel === '1' ? `<rect x="${x*2+1}" y="${y*2}" width="2" height="2" fill="${colors[cell.adjacent]}"/>` : '').join('')).join(''), 12, 14);
+        } else if (cell.question && !cell.revealed) button.textContent = '?';
+        const dict = translations[currentLanguage];
+        button.setAttribute('aria-label', `${Math.floor(index/MINESWEEPER_COLS)+1}, ${index%MINESWEEPER_COLS+1}: ${cell.flagged ? dict.minesweeperFlaggedCell : cell.revealed ? cell.mine ? (currentLanguage === 'en' ? 'Mine' : 'Mina') : `${dict.minesweeperRevealedCell} ${cell.adjacent}` : dict.minesweeperHiddenCell}${cell.question && !cell.revealed ? ' ?' : ''}`);
+        button.addEventListener('click', event => event.shiftKey ? toggleMinesweeperFlag(index) : revealMinesweeperCell(index));
+        button.addEventListener('contextmenu', event => { event.preventDefault(); toggleMinesweeperFlag(index); });
+        button.addEventListener('dblclick', () => chordMinesweeper(index));
+        button.addEventListener('pointerdown', event => { if (!minesweeperGameOver && event.button === 0) mineFace('pressed'); });
+        button.addEventListener('keydown', event => {
+            const offsets = {ArrowLeft: -1, ArrowRight: 1, ArrowUp: -MINESWEEPER_COLS, ArrowDown: MINESWEEPER_COLS};
+            if (event.key in offsets) { event.preventDefault(); board.children[Math.max(0, Math.min(minesweeperBoard.length-1, index+offsets[event.key]))].focus(); }
+            if (event.key.toLowerCase() === 'f') { event.preventDefault(); toggleMinesweeperFlag(index); }
+        });
+        board.appendChild(button);
+    });
+    if (focused !== null) board.children[focused]?.focus({preventScroll: true});
 }
-
-
-/* =========================
-   DESCUBRIR CASILLA
-========================= */
-
+function floodReveal(index) {
+    const stack = [index];
+    while (stack.length) {
+        const i = stack.pop(), cell = minesweeperBoard[i];
+        if (cell.revealed || cell.flagged || cell.mine) continue;
+        cell.revealed = true; cell.question = false;
+        if (!cell.adjacent) stack.push(...getNeighbors(i));
+    }
+}
 function revealMinesweeperCell(index) {
-
-    if (
-        minesweeperGameOver
-    ) {
-        return;
+    const cell = minesweeperBoard[index];
+    if (minesweeperGameOver || cell.revealed || cell.flagged) return;
+    if (minesweeperFirstMove) {
+        placeMines(index); minesweeperFirstMove = false; mineStartedAt = Date.now();
+        mineInterval = setInterval(() => { mineSeconds = Math.min(999, Math.floor((Date.now()-mineStartedAt)/1000)); mineDisplay('mineTimer', mineSeconds); }, 250);
     }
-
-
-    const cell =
-        minesweeperBoard[
-            index
-        ];
-
-
-    if (
-        cell.revealed ||
-        cell.flagged
-    ) {
-        return;
-    }
-
-
-    /* PRIMER CLICK NUNCA ES MINA */
-
-    if (
-        minesweeperFirstMove
-    ) {
-
-        placeMines(
-            index
-        );
-
-
-        minesweeperFirstMove =
-            false;
-
-    }
-
-
-    /* PISAR MINA */
-
-    if (
-        cell.mine
-    ) {
-
-        cell.revealed =
-            true;
-
-
-        minesweeperGameOver =
-            true;
-
-
-        minesweeperResult =
-            "lost";
-
-
-        revealAllMines();
-
-
-        renderMinesweeperBoard();
-
-        updateMinesweeperStatus();
-
-
-        return;
-    }
-
-
-    floodReveal(
-        index
-    );
-
-
-    checkMinesweeperWin();
-
-
-    renderMinesweeperBoard();
-
-    updateMinesweeperStatus();
+    if (cell.mine) {
+        cell.exploded = true; minesweeperGameOver = true; minesweeperResult = 'lost';
+        minesweeperBoard.forEach(c => { if (c.mine && !c.flagged) c.revealed = true; });
+    } else { floodReveal(index); checkMinesweeperWin(); }
+    renderMinesweeperBoard(); updateMinesweeperStatus();
 }
-
-
-/* =========================
-   ABRIR CASILLAS VACIAS
-========================= */
-
-function floodReveal(startIndex) {
-
-    const stack =
-        [startIndex];
-
-
-    const visited =
-        new Set();
-
-
-    while (
-        stack.length > 0
-    ) {
-
-        const index =
-            stack.pop();
-
-
-        if (
-            visited.has(
-                index
-            )
-        ) {
-            continue;
-        }
-
-
-        visited.add(
-            index
-        );
-
-
-        const cell =
-            minesweeperBoard[
-                index
-            ];
-
-
-        if (
-            cell.mine ||
-            cell.flagged
-        ) {
-            continue;
-        }
-
-
-        cell.revealed =
-            true;
-
-
-        if (
-            cell.adjacent === 0
-        ) {
-
-            const neighbors =
-                getNeighbors(
-                    index
-                );
-
-
-            neighbors.forEach(
-                neighborIndex => {
-
-                    const neighbor =
-                        minesweeperBoard[
-                            neighborIndex
-                        ];
-
-
-                    if (
-                        !neighbor.revealed &&
-                        !neighbor.mine &&
-                        !neighbor.flagged
-                    ) {
-
-                        stack.push(
-                            neighborIndex
-                        );
-
-                    }
-
-                }
-            );
-
-        }
-
-    }
+function chordMinesweeper(index) {
+    const cell = minesweeperBoard[index], neighbors = getNeighbors(index);
+    if (minesweeperGameOver || !cell.revealed || !cell.adjacent || neighbors.filter(i => minesweeperBoard[i].flagged).length !== cell.adjacent) return;
+    neighbors.forEach(i => { if (!minesweeperGameOver) revealMinesweeperCell(i); });
 }
-
-
-/* =========================
-   BANDERAS
-========================= */
-
 function toggleMinesweeperFlag(index) {
-
-    if (
-        minesweeperGameOver
-    ) {
-        return;
-    }
-
-
-    const cell =
-        minesweeperBoard[
-            index
-        ];
-
-
-    if (
-        cell.revealed
-    ) {
-        return;
-    }
-
-
-    if (
-        cell.flagged
-    ) {
-
-        cell.flagged =
-            false;
-
-
-        minesweeperFlags--;
-
-    } else {
-
-        if (
-            minesweeperFlags >=
-            MINESWEEPER_MINES
-        ) {
-            return;
-        }
-
-
-        cell.flagged =
-            true;
-
-
-        minesweeperFlags++;
-
-    }
-
-
-    renderMinesweeperBoard();
-
-    updateMinesweeperStatus();
+    const cell = minesweeperBoard[index];
+    if (minesweeperGameOver || cell.revealed) return;
+    if (cell.flagged) { cell.flagged = false; cell.question = mineMarks; minesweeperFlags--; }
+    else if (cell.question) cell.question = false;
+    else { cell.flagged = true; minesweeperFlags++; }
+    renderMinesweeperBoard(); updateMinesweeperStatus();
 }
-
-
-/* =========================
-   MOSTRAR TODAS LAS MINAS
-========================= */
-
-function revealAllMines() {
-
-    minesweeperBoard
-        .forEach(
-            cell => {
-
-                if (
-                    cell.mine
-                ) {
-
-                    cell.revealed =
-                        true;
-
-                }
-
-            }
-        );
-}
-
-
-/* =========================
-   COMPROBAR VICTORIA
-========================= */
-
 function checkMinesweeperWin() {
-
-    const safeCells =
-        minesweeperBoard.filter(
-            cell =>
-                !cell.mine
-        );
-
-
-    const allSafeRevealed =
-        safeCells.every(
-            cell =>
-                cell.revealed
-        );
-
-
-    if (
-        allSafeRevealed
-    ) {
-
-        minesweeperGameOver =
-            true;
-
-
-        minesweeperResult =
-            "won";
-
-
-        minesweeperBoard
-            .forEach(
-                cell => {
-
-                    if (
-                        cell.mine
-                    ) {
-
-                        cell.flagged =
-                            true;
-
-                    }
-
-                }
-            );
-
-
-        minesweeperFlags =
-            MINESWEEPER_MINES;
-
+    if (minesweeperBoard.every(cell => cell.mine || cell.revealed)) {
+        minesweeperGameOver = true; minesweeperResult = 'won';
+        minesweeperBoard.forEach(cell => { if (cell.mine) { cell.flagged = true; cell.question = false; } });
+        minesweeperFlags = MINESWEEPER_MINES;
     }
 }
-
-
-/* =========================
-   ACTUALIZAR PANEL
-========================= */
-
 function updateMinesweeperStatus() {
-
-    const counter =
-        document.getElementById(
-            "mineCounter"
-        );
-
-
-    const status =
-        document.getElementById(
-            "minesweeperStatus"
-        );
-
-
-    const resetButton =
-        document.getElementById(
-            "minesweeperReset"
-        );
-
-
-    if (
-        !counter ||
-        !status ||
-        !resetButton
-    ) {
-        return;
-    }
-
-
-    const dictionary =
-        translations[
-            currentLanguage
-        ];
-
-
-    counter.textContent =
-        MINESWEEPER_MINES -
-        minesweeperFlags;
-
-
-    if (
-        minesweeperResult ===
-        "won"
-    ) {
-
-        status.textContent =
-            dictionary
-                .minesweeperWon;
-
-
-        resetButton.textContent =
-            "😎";
-
-    } else if (
-        minesweeperResult ===
-        "lost"
-    ) {
-
-        status.textContent =
-            dictionary
-                .minesweeperLost;
-
-
-        resetButton.textContent =
-            "😵";
-
-    } else {
-
-        status.textContent =
-            dictionary
-                .minesweeperPlaying;
-
-
-        resetButton.textContent =
-            "🙂";
-
-    }
-
-
-    resetButton.title =
-        dictionary
-            .minesweeperNewGame;
-
-
-    resetButton.setAttribute(
-        "aria-label",
-
-        dictionary
-            .minesweeperNewGame
-    );
+    if (minesweeperGameOver) { clearInterval(mineInterval); mineInterval = null; }
+    mineDisplay('mineCounter', MINESWEEPER_MINES-minesweeperFlags); mineDisplay('mineTimer', mineSeconds); mineFace();
+    const dict = translations[currentLanguage];
+    document.querySelector('#minesweeper .window-title').innerHTML = mineSprite('mine') + (currentLanguage === 'en' ? 'Minesweeper' : 'Buscaminas');
+    document.getElementById('minesweeperStatus').textContent = minesweeperResult === 'won' ? dict.minesweeperWon : minesweeperResult === 'lost' ? dict.minesweeperLost : dict.minesweeperPlaying;
+    const reset = document.getElementById('minesweeperReset');
+    reset.title = dict.minesweeperNewGame; reset.setAttribute('aria-label', dict.minesweeperNewGame);
+    document.querySelectorAll('[data-mine-text]').forEach(el => el.textContent = (mineCopy[currentLanguage] || mineCopy.es)[el.dataset.mineText]);
+    document.querySelectorAll('[data-mine-level]').forEach(el => el.setAttribute('aria-checked', el.dataset.mineLevel === mineLevel));
+    document.querySelector('[data-mine-action="marks"]').setAttribute('aria-checked', mineMarks);
 }
-
-
-/* =========================
-   BOTON REINICIAR
-========================= */
-
-const minesweeperReset =
-    document.getElementById(
-        "minesweeperReset"
-    );
-
-
-if (
-    minesweeperReset
-) {
-
-    minesweeperReset
-        .addEventListener(
-            "click",
-            createMinesweeper
-        );
-
-}
+document.getElementById('minesweeperReset').addEventListener('click', createMinesweeper);
+document.addEventListener('pointerup', () => mineFace());
+document.addEventListener('pointercancel', () => mineFace());
+document.querySelectorAll('#minesweeper details').forEach(menu => menu.addEventListener('toggle', () => {
+    if (menu.open) document.querySelectorAll('#minesweeper details').forEach(other => { if (other !== menu) other.open = false; });
+}));
+document.addEventListener('pointerdown', event => {
+    if (!event.target.closest('#minesweeper .mine-menu')) document.querySelectorAll('#minesweeper details').forEach(menu => menu.open = false);
+});
+document.querySelectorAll('[data-mine-level], [data-mine-action]').forEach(button => button.addEventListener('click', () => {
+    if (button.dataset.mineLevel) {
+        mineLevel = button.dataset.mineLevel;
+        [MINESWEEPER_ROWS, MINESWEEPER_COLS, MINESWEEPER_MINES] = {beginner: [8,8,10], intermediate: [16,16,40], expert: [16,30,99]}[mineLevel];
+        createMinesweeper();
+    } else if (button.dataset.mineAction === 'new') createMinesweeper();
+    else if (button.dataset.mineAction === 'exit') closeWindow('minesweeper');
+    else { mineMarks = !mineMarks; if (!mineMarks) minesweeperBoard.forEach(cell => cell.question = false); renderMinesweeperBoard(); updateMinesweeperStatus(); }
+    document.getElementById('mineGameMenu').open = false;
+}));
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') document.querySelectorAll('#minesweeper details').forEach(menu => menu.open = false);
+    if (event.key === 'F2' && document.getElementById('minesweeper').classList.contains('active')) { event.preventDefault(); createMinesweeper(); }
+});
 
 
 /* VENTANAS ARRASTRABLES */

@@ -894,7 +894,7 @@
 <div
     class="window minesweeper-window"
     id="minesweeper"
-    style="top:85px; left:320px; width:390px;"
+    style="top:85px; left:320px; width:164px;"
 >
 
     <div class="window-header">
@@ -915,7 +915,7 @@
                 _
             </button>
 
-            <button class="win-btn">
+            <button class="win-btn" disabled aria-label="Maximizar">
                 □
             </button>
 
@@ -931,86 +931,34 @@
     </div>
 
 
-    <div class="menu-bar">
-
-        <span data-i18n="file">
-            Archivo
-        </span>
-
-        <span data-i18n="view">
-            Ver
-        </span>
-
-        <span data-i18n="help">
-            Ayuda
-        </span>
-
+    <div class="mine-menu">
+        <details id="mineGameMenu">
+            <summary data-mine-text="game">Juego</summary>
+            <div class="mine-menu-popup">
+                <button type="button" data-mine-action="new"><span data-mine-text="new">Nuevo</span><span>F2</span></button>
+                <hr>
+                <button type="button" data-mine-level="beginner" data-mine-text="beginner">Principiante</button>
+                <button type="button" data-mine-level="intermediate" data-mine-text="intermediate">Intermedio</button>
+                <button type="button" data-mine-level="expert" data-mine-text="expert">Experto</button>
+                <hr>
+                <button type="button" data-mine-action="marks" data-mine-text="marks">Marcas (?)</button>
+                <hr>
+                <button type="button" data-mine-action="exit" data-mine-text="exit">Salir</button>
+            </div>
+        </details>
+        <details id="mineHelpMenu">
+            <summary data-mine-text="help">Ayuda</summary>
+            <div class="mine-menu-popup mine-instructions" data-mine-text="instructions">Descubre todas las casillas sin minas. Clic derecho o Mayús + clic: bandera, interrogación y sin marca. Doble clic en un número: abrir vecinos cuando tenga las banderas necesarias. F2: nueva partida.</div>
+        </details>
     </div>
-
-
-    <!-- buscamina -->
-
     <div class="window-content minesweeper-content">
-
         <div class="minesweeper-panel">
-
-            <div class="minesweeper-counter">
-
-                <span data-i18n="minesLabel">
-                    Minas
-                </span>
-
-                <span>:</span>
-
-                <span id="mineCounter">
-                    10
-                </span>
-
-            </div>
-
-
-            <button
-                type="button"
-                id="minesweeperReset"
-                class="minesweeper-reset"
-            >
-                🙂
-            </button>
-
-
-            <div class="minesweeper-status">
-
-                <span data-i18n="statusLabel">
-                    Estado
-                </span>
-
-                <span>:</span>
-
-                <span id="minesweeperStatus">
-                    Jugando
-                </span>
-
-            </div>
-
+            <div id="mineCounter" class="mine-led" role="img" aria-label="10 minas"></div>
+            <button type="button" id="minesweeperReset" class="minesweeper-reset" aria-label="Nueva partida"></button>
+            <div id="mineTimer" class="mine-led" role="img" aria-label="0 segundos"></div>
         </div>
-
-
-        <div
-            id="minesweeperBoard"
-            class="minesweeper-board"
-            role="grid"
-        >
-        </div>
-
-
-        <p
-            class="minesweeper-help"
-            data-i18n="minesweeperHelp"
-        >
-            Clic izquierdo: descubrir ·
-            Clic derecho: colocar bandera.
-        </p>
-
+        <div id="minesweeperBoard" class="minesweeper-board" role="grid"></div>
+        <span id="minesweeperStatus" class="mine-sr-only" role="status"></span>
     </div>
 
 </div>
